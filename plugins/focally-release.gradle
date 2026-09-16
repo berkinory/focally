@@ -1,0 +1,43 @@
+def focallyProperties = new Properties()
+def focallyPropertiesFile = rootProject.file("../credentials/android/keystore.properties")
+if (focallyPropertiesFile.exists()) {
+    focallyPropertiesFile.withInputStream { focallyProperties.load(it) }
+}
+
+android {
+    defaultConfig {
+        minSdkVersion 29
+    }
+    signingConfigs {
+        focally {
+            if (focallyPropertiesFile.exists()) {
+                storeFile rootProject.file(focallyProperties.getProperty("storeFile"))
+                storePassword focallyProperties.getProperty("storePassword")
+                keyAlias focallyProperties.getProperty("keyAlias")
+                keyPassword focallyProperties.getProperty("keyPassword")
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.focally
+            minifyEnabled true
+            shrinkResources true
+        }
+    }
+    // Compress native libraries in the APK; Android extracts them at installation.
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging true
+        }
+    }
+}
+
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    doFirst {
+        def required = ["storeFile", "storePassword", "keyAlias", "keyPassword"]
+        if (required.any { !focallyProperties.getProperty(it)?.trim() }) {
+            throw new GradleException("Release signing is missing. Run bun android:key or configure credentials/android/keystore.properties with your existing release key.")
+        }
+    }
+}

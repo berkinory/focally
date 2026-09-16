@@ -1,0 +1,37 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit"
+  },
+  "workbench.editor.customLabels.patterns": {
+    "**/app/**/{_layout,index}.*": "${dirname}/${filename}.${extname}",
+    "**/index.*": "${dirname}/index.${extname}"
+  },
+  "files.exclude": {
+    "**/dist": true,
+    "**/*.tsbuildinfo": true,
+    "**/node_modules": true,
+    "**/.DS_Store": true,
+    "**/.expo": true
+  }
+}
