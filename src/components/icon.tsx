@@ -28,8 +28,20 @@ import { HugeiconsIcon } from "@hugeicons/react-native";
 
 import { colors } from "@/lib/theme";
 
+const compactFlashOff: typeof FlashOffIcon = FlashOffIcon.map(
+  ([tag, attrs]) => [
+    tag,
+    attrs.key === "2"
+      ? {
+          ...attrs,
+          transform: "translate(12 12) scale(0.94) translate(-12 -12)",
+        }
+      : attrs,
+  ]
+);
+
 const icons = {
-  "flash-off": FlashOffIcon,
+  "flash-off": compactFlashOff,
   "timer-off": TimerOffIcon,
   exposure: PlusMinusCircle01Icon,
   aspect: SquareIcon,
