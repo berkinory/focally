@@ -415,7 +415,7 @@ export function CameraScreen() {
               exposure={settings.exposure}
               flash={flash}
               level={level}
-              volumeShutter={volumeShutter}
+              volumeShutter={camera.capabilities.volumeShutter && volumeShutter}
               photoLocation={photoLocation}
               onControls={({ nativeEvent }) => setControls(nativeEvent)}
               onShutter={handleShutter}

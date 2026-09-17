@@ -6,6 +6,11 @@ import type { NativeSyntheticEvent, ViewProps } from "react-native";
 export type FocalLength = 35 | 50 | 85;
 export type PhotoRatio = "4:3" | "3:2" | "1:1";
 export type FlashMode = "off" | "auto" | "on";
+export type PermissionState = "granted" | "denied" | "blocked";
+export interface CameraCapabilities {
+  deleteDeviceCopies: boolean;
+  volumeShutter: boolean;
+}
 export type CameraStatus =
   | "paused"
   | "starting"
@@ -73,6 +78,11 @@ interface CameraViewProps extends ViewProps {
   onShutter: (event: NativeSyntheticEvent<Record<string, never>>) => void;
 }
 interface FocallyModule extends NativeModule {
+  readonly capabilities: CameraCapabilities;
+  getCameraPermission(): Promise<PermissionState>;
+  requestCameraPermission(): Promise<PermissionState>;
+  getLocationPermission(): Promise<PermissionState>;
+  requestLocationPermission(): Promise<PermissionState>;
   getLastPhoto(): Promise<CameraPhoto | null>;
   getPhotos(
     before: string | null,

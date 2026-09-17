@@ -5,11 +5,24 @@ const config: ExpoConfig = {
   slug: "focally",
   scheme: "focally",
   version: "0.0.1",
-  platforms: ["android"],
+  platforms: ["android", "ios"],
   orientation: "default",
   userInterfaceStyle: "dark",
   backgroundColor: "#08090B",
   icon: "./assets/brand/icon.png",
+  ios: {
+    bundleIdentifier: "dev.berk.focally",
+    buildNumber: "2",
+    supportsTablet: true,
+    infoPlist: {
+      NSCameraUsageDescription:
+        "Focally uses the camera only to take photos on your device.",
+      NSLocationWhenInUseUsageDescription:
+        "Focally can add your location to photos when you enable geotagging.",
+      NSPhotoLibraryAddUsageDescription:
+        "Focally saves photos to your library when auto-save is enabled or you tap save.",
+    },
+  },
   android: {
     package: "dev.berk.focally",
     versionCode: 2,
@@ -69,6 +82,13 @@ const config: ExpoConfig = {
                 },
               ],
             },
+          ],
+        },
+        ios: {
+          fonts: [
+            "./node_modules/@expo-google-fonts/manrope/400Regular/Manrope_400Regular.ttf",
+            "./node_modules/@expo-google-fonts/manrope/500Medium/Manrope_500Medium.ttf",
+            "./node_modules/@expo-google-fonts/manrope/600SemiBold/Manrope_600SemiBold.ttf",
           ],
         },
       },

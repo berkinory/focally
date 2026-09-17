@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { camera } from "@/camera";
 import { AspectOption } from "@/components/aspect-ratio";
 import { IconButton } from "@/components/controls";
 import { Icon } from "@/components/icon";
@@ -114,13 +115,17 @@ export default function SettingsScreen() {
             onChange={(value) => setSetting("level", value)}
           />
           <View style={styles.divider} />
-          <Preference
-            icon="volume"
-            title={t("settings.volume")}
-            value={volumeShutter}
-            onChange={setVolumeShutter}
-          />
-          <View style={styles.divider} />
+          {camera.capabilities.volumeShutter && (
+            <>
+              <Preference
+                icon="volume"
+                title={t("settings.volume")}
+                value={volumeShutter}
+                onChange={setVolumeShutter}
+              />
+              <View style={styles.divider} />
+            </>
+          )}
           <Preference
             icon="gallery"
             title={t("settings.autoReview")}

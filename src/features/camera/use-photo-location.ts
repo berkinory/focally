@@ -1,12 +1,10 @@
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { AppState, Linking, PermissionsAndroid } from "react-native";
+import { AppState, Linking } from "react-native";
 
+import { camera } from "@/camera";
 import { usePhotoLocationPreference } from "@/lib/camera-prefs";
 import { createLocationAccess } from "@/lib/location-access";
-
-const { ACCESS_COARSE_LOCATION: coarse, ACCESS_FINE_LOCATION: fine } =
-  PermissionsAndroid.PERMISSIONS;
 
 export function usePhotoLocation() {
   const [stored, setStored] = usePhotoLocationPreference();
@@ -17,19 +15,8 @@ export function usePhotoLocation() {
   const access = useMemo(
     () =>
       createLocationAccess({
-        check: async () =>
-          (await PermissionsAndroid.check(coarse)) ||
-          (await PermissionsAndroid.check(fine)),
-        request: async () => {
-          const result = await PermissionsAndroid.requestMultiple([
-            coarse,
-            fine,
-          ]);
-          if (result[coarse] === "granted" || result[fine] === "granted") {
-            return "granted";
-          }
-          return result[coarse] === "never_ask_again" ? "blocked" : "denied";
-        },
+        check: async () => (await camera.getLocationPermission()) === "granted",
+        request: () => camera.requestLocationPermission(),
         openSettings: () => Linking.openSettings(),
         setEnabled: setStored,
         onPermission: setGranted,

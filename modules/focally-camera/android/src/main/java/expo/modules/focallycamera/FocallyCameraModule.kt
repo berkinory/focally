@@ -1,15 +1,52 @@
 package expo.modules.focallycamera
 
+import android.Manifest
 import android.content.ClipData
 import android.content.Intent
 import androidx.core.content.ContextCompat
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import expo.modules.interfaces.permissions.Permissions
+import expo.modules.interfaces.permissions.PermissionsResponseListener
+import expo.modules.interfaces.permissions.PermissionsStatus
 
 class FocallyCameraModule : Module() {
     override fun definition() = ModuleDefinition {
         Name("FocallyCamera")
+
+        Constant("capabilities") {
+            mapOf("deleteDeviceCopies" to true, "volumeShutter" to true)
+        }
+
+        AsyncFunction("getCameraPermission") { promise: Promise ->
+            permission(arrayOf(Manifest.permission.CAMERA), false, promise)
+        }
+        AsyncFunction("requestCameraPermission") { promise: Promise ->
+            permission(arrayOf(Manifest.permission.CAMERA), true, promise)
+        }
+        AsyncFunction("getLocationPermission") { promise: Promise ->
+            permission(
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                ),
+                false,
+                promise,
+                anyGranted = true,
+            )
+        }
+        AsyncFunction("requestLocationPermission") { promise: Promise ->
+            permission(
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                ),
+                true,
+                promise,
+                anyGranted = true,
+            )
+        }
 
         AsyncFunction("getLastPhoto") {
             val context = appContext.reactContext ?: error("Application context is unavailable.")
@@ -70,6 +107,41 @@ class FocallyCameraModule : Module() {
                 view.capture(autoSave, keepOriginal, promise)
             }
             OnViewDestroys { view: FocallyCameraView -> view.dispose() }
+        }
+    }
+
+    private fun permission(
+        values: Array<String>,
+        request: Boolean,
+        promise: Promise,
+        anyGranted: Boolean = false,
+    ) {
+        val manager = appContext.legacyModule<Permissions>()
+        if (manager == null) {
+            promise.reject("PERMISSION_FAILED", "Permission service is unavailable.", null)
+            return
+        }
+        val listener =
+            PermissionsResponseListener { result ->
+                val responses = values.mapNotNull(result::get)
+                val granted =
+                    if (anyGranted) responses.any { it.status == PermissionsStatus.GRANTED }
+                    else
+                        responses.size == values.size &&
+                            responses.all { it.status == PermissionsStatus.GRANTED }
+                promise.resolve(
+                    when {
+                        granted -> "granted"
+                        responses.any { it.canAskAgain } -> "denied"
+                        else -> "blocked"
+                    }
+                )
+            }
+        try {
+            if (request) manager.askForPermissions(listener, *values)
+            else manager.getPermissions(listener, *values)
+        } catch (error: Exception) {
+            promise.reject("PERMISSION_FAILED", "Could not access permissions.", error)
         }
     }
 

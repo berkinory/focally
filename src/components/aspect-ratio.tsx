@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: colors.secondary,
     fontVariant: ["tabular-nums"],
+    transform: [{ translateX: -1 }, { translateY: -2 }],
   },
   option: {
     flexDirection: "row",

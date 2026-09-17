@@ -535,7 +535,10 @@ export default function PhotoScreen() {
           }
           const selected = photo;
           void action(async () => {
-            await camera.deletePhoto(selected.uri, deleteDeviceCopies);
+            await camera.deletePhoto(
+              selected.uri,
+              camera.capabilities.deleteDeviceCopies && deleteDeviceCopies
+            );
             publishPhotoChange({ kind: "deleted", uri: selected.uri });
             if (mounted.current) {
               setConfirmDelete(false);
@@ -545,25 +548,29 @@ export default function PhotoScreen() {
           }, t("photo.deleteFailed"));
         }}
       >
-        <Pressable
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: deleteDeviceCopies, disabled: busy }}
-          disabled={busy}
-          onPress={() => {
-            selectionFeedback();
-            setDeleteDeviceCopies(!deleteDeviceCopies);
-          }}
-          style={styles.checkboxRow}
-        >
-          <View style={[styles.checkbox, deleteDeviceCopies && styles.checked]}>
-            {deleteDeviceCopies && (
-              <Icon name="check" size={16} color={colors.accent} />
-            )}
-          </View>
-          <Text style={styles.checkboxLabel}>
-            {t("photo.deleteDeviceCopies")}
-          </Text>
-        </Pressable>
+        {camera.capabilities.deleteDeviceCopies && (
+          <Pressable
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: deleteDeviceCopies, disabled: busy }}
+            disabled={busy}
+            onPress={() => {
+              selectionFeedback();
+              setDeleteDeviceCopies(!deleteDeviceCopies);
+            }}
+            style={styles.checkboxRow}
+          >
+            <View
+              style={[styles.checkbox, deleteDeviceCopies && styles.checked]}
+            >
+              {deleteDeviceCopies && (
+                <Icon name="check" size={16} color={colors.accent} />
+              )}
+            </View>
+            <Text style={styles.checkboxLabel}>
+              {t("photo.deleteDeviceCopies")}
+            </Text>
+          </Pressable>
+        )}
         {error !== null && (
           <Text accessibilityLiveRegion="polite" style={styles.dialogError}>
             {error}

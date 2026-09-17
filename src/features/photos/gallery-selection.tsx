@@ -7,6 +7,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { camera } from "@/camera";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { IconButton } from "@/components/controls";
 import { Icon } from "@/components/icon";
@@ -136,27 +137,34 @@ export function GallerySelection({
         onCancel={() => setConfirmDelete(false)}
         onConfirm={() => {
           setConfirmDelete(false);
-          void selection.run("delete", deleteDeviceCopies);
+          void selection.run(
+            "delete",
+            camera.capabilities.deleteDeviceCopies && deleteDeviceCopies
+          );
         }}
       >
-        <Pressable
-          accessibilityRole="checkbox"
-          accessibilityState={{ checked: deleteDeviceCopies }}
-          onPress={() => {
-            selectionFeedback();
-            setDeleteDeviceCopies(!deleteDeviceCopies);
-          }}
-          style={styles.checkboxRow}
-        >
-          <View style={[styles.checkbox, deleteDeviceCopies && styles.checked]}>
-            {deleteDeviceCopies && (
-              <Icon name="check" size={16} color={colors.accent} />
-            )}
-          </View>
-          <Text style={styles.checkboxLabel}>
-            {t("photo.deleteDeviceCopies")}
-          </Text>
-        </Pressable>
+        {camera.capabilities.deleteDeviceCopies && (
+          <Pressable
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: deleteDeviceCopies }}
+            onPress={() => {
+              selectionFeedback();
+              setDeleteDeviceCopies(!deleteDeviceCopies);
+            }}
+            style={styles.checkboxRow}
+          >
+            <View
+              style={[styles.checkbox, deleteDeviceCopies && styles.checked]}
+            >
+              {deleteDeviceCopies && (
+                <Icon name="check" size={16} color={colors.accent} />
+              )}
+            </View>
+            <Text style={styles.checkboxLabel}>
+              {t("photo.deleteDeviceCopies")}
+            </Text>
+          </Pressable>
+        )}
       </ConfirmDialog>
     </>
   );

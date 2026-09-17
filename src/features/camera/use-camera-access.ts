@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { AppState, Linking, PermissionsAndroid } from "react-native";
+import { AppState, Linking } from "react-native";
 
+import { camera } from "@/camera";
 import { useTranslation } from "@/lib/i18n";
 
 type Access = "checking" | "granted" | "denied" | "blocked";
@@ -15,13 +16,9 @@ export function useCameraAccess() {
     let mounted = true;
     const check = async () => {
       try {
-        const allowed = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.CAMERA
-        );
+        const result = await camera.getCameraPermission();
         if (mounted) {
-          setAccess((previous) =>
-            allowed ? "granted" : previous === "blocked" ? "blocked" : "denied"
-          );
+          setAccess(result);
         }
       } catch {
         if (mounted) {
@@ -49,16 +46,7 @@ export function useCameraAccess() {
         await Linking.openSettings();
         return;
       }
-      const result = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA
-      );
-      setAccess(
-        result === "granted"
-          ? "granted"
-          : result === "never_ask_again"
-            ? "blocked"
-            : "denied"
-      );
+      setAccess(await camera.requestCameraPermission());
     } catch {
       setError(t("camera.permissionOpenFailed"));
     }
